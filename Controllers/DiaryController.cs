@@ -25,27 +25,29 @@ public class DiaryController : ControllerBase
         var startDateTime = day.Date + slotStart;
         var endDateTime = day.Date + slotEnd;
 
-        // Find all slots that overlap with the requested window
+        // Get all meetings for the day, ordered by start time
         var existingMeetings = await _context.DiarySlots
-            .Where(s => s.StartTime.Date == day.Date &&
-                        s.EndTime > startDateTime &&
-                        s.StartTime < endDateTime)
+            .Where(s => s.StartTime.Date == day.Date)
             .OrderBy(s => s.StartTime)
             .ToListAsync();
 
         var current = startDateTime;
-        while (current.AddMinutes(minutes) <= endDateTime)
+        while (current <= endDateTime)
         {
-            var next = current.AddMinutes(minutes);
+            var proposedEnd = current.AddMinutes(minutes);
+
+            // Check for overlap with any existing meeting
             bool conflict = existingMeetings.Any(m =>
-                m.StartTime < next && m.EndTime > current);
+                m.StartTime < proposedEnd && m.EndTime > current);
 
             if (!conflict)
-                return Ok(new { Start = current, End = next });
+                return Ok(new { Start = current, End = proposedEnd });
 
-            // Move to the end of the next conflicting meeting
-            var nextMeeting = existingMeetings.First(m => m.StartTime < next && m.EndTime > current);
-            current = nextMeeting.EndTime;
+            // Move to the end of the next conflicting meeting or increment by 1 minute if none found
+            var nextMeeting = existingMeetings.FirstOrDefault(m => m.StartTime >= current);
+            current = nextMeeting != null && nextMeeting.EndTime > current
+                ? nextMeeting.EndTime
+                : current.AddMinutes(1);
         }
 
         return NotFound("No available slot found.");
