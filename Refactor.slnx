@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../RefactorTests/Refactor.Tests.csproj" />
   <Project Path="Refactor.csproj" />
 </Solution>
