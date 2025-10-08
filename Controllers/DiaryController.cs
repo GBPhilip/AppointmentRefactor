@@ -25,7 +25,6 @@ public class DiaryController : ControllerBase
         var startDate = day.Date + slotStart;
         var endTime = day.Date + slotEnd;
 
-        // Get all meetings for the day, ordered by start time
         var items = await _context.DiarySlots
             .Where(x => x.StartTime.Date == day.Date)
             .OrderBy(x => x.StartTime)
@@ -36,14 +35,12 @@ public class DiaryController : ControllerBase
         {
             var endTimeCandidate = current.AddMinutes(minutes);
 
-            // Check for overlap with any existing meeting
             bool clash = items.Any(y =>
                 y.StartTime < endTimeCandidate && y.EndTime > current);
 
             if (!clash)
                 return Ok(new { Start = current, End = endTimeCandidate });
 
-            // Move to the end of the next conflicting meeting or increment by 1 minute if none found
             var next = items.FirstOrDefault(y => y.StartTime >= current);
             current = next != null && next.EndTime > current
                 ? next.EndTime
