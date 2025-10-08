@@ -22,31 +22,31 @@ public class DiaryController : ControllerBase
         if (minutes <= 0 || minutes > 120)
             return BadRequest("Minutes must be between 1 and 120.");
 
-        var startDateTime = day.Date + slotStart;
-        var endDateTime = day.Date + slotEnd;
+        var startDate = day.Date + slotStart;
+        var endTime = day.Date + slotEnd;
 
         // Get all meetings for the day, ordered by start time
-        var existingMeetings = await _context.DiarySlots
-            .Where(s => s.StartTime.Date == day.Date)
-            .OrderBy(s => s.StartTime)
+        var items = await _context.DiarySlots
+            .Where(x => x.StartTime.Date == day.Date)
+            .OrderBy(x => x.StartTime)
             .ToListAsync();
 
-        var current = startDateTime;
-        while (current <= endDateTime)
+        var current = startDate;
+        while (current <= endTime)
         {
-            var proposedEnd = current.AddMinutes(minutes);
+            var endTimeCandidate = current.AddMinutes(minutes);
 
             // Check for overlap with any existing meeting
-            bool conflict = existingMeetings.Any(m =>
-                m.StartTime < proposedEnd && m.EndTime > current);
+            bool clash = items.Any(y =>
+                y.StartTime < endTimeCandidate && y.EndTime > current);
 
-            if (!conflict)
-                return Ok(new { Start = current, End = proposedEnd });
+            if (!clash)
+                return Ok(new { Start = current, End = endTimeCandidate });
 
             // Move to the end of the next conflicting meeting or increment by 1 minute if none found
-            var nextMeeting = existingMeetings.FirstOrDefault(m => m.StartTime >= current);
-            current = nextMeeting != null && nextMeeting.EndTime > current
-                ? nextMeeting.EndTime
+            var next = items.FirstOrDefault(y => y.StartTime >= current);
+            current = next != null && next.EndTime > current
+                ? next.EndTime
                 : current.AddMinutes(1);
         }
 
