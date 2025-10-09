@@ -22,6 +22,13 @@ public class DiaryController : ControllerBase
         if (minutes <= 0 || minutes > 120)
             return BadRequest("Minutes must be between 1 and 120.");
 
+        if (slotStart < TimeSpan.Zero || slotStart >= TimeSpan.FromDays(1) ||
+            slotEnd < TimeSpan.Zero || slotEnd > TimeSpan.FromDays(1) ||
+            slotStart >= slotEnd)
+        {
+            return BadRequest("slotStart and slotEnd must be within the same day and slotStart < slotEnd.");
+        }
+
         var startDate = day.Date + slotStart;
         var endTime = day.Date + slotEnd;
 
