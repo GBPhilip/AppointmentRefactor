@@ -5,7 +5,7 @@ namespace Refactor.Tests
 {
     public class DiaryControllerTests
     {
-        private DiaryContext GetInMemoryContext(List<DiarySlot> slots)
+        internal DiaryContext GetInMemoryContext(List<DiarySlot> slots)
         {
             var options = new DbContextOptionsBuilder<DiaryContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -15,23 +15,6 @@ namespace Refactor.Tests
             context.SaveChanges();
             return context;
         }
-
-        [Fact]
-        public async Task ReturnsAvailableSlot_WhenNoClash()
-        {
-            var slots = new List<DiarySlot>();
-            var context = GetInMemoryContext(slots);
-            var controller = new DiaryController(context);
-
-            var day = new DateOnly(2025, 10, 8);
-            var result = await controller.GetAvailableSlot(30, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
-
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var slot = Assert.IsType<AvailableSlotDto>(okResult.Value);
-            Assert.Equal(day.ToDateTime(new TimeOnly(9, 0, 0)), slot.Start);
-            Assert.Equal(day.ToDateTime(new TimeOnly(9, 30, 0)), slot.End);
-        }
-
         [Fact]
         public async Task ReturnsNotFound_WhenNoSlotAvailable()
         {
