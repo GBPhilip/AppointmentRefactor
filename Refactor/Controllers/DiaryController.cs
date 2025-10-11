@@ -34,7 +34,7 @@ public class DiaryController : ControllerBase
             .ToListAsync();
 
         var current = startDate;
-        while (current <= endTime)
+        while (current < endTime)
         {
             var endTimeCandidate = current.AddMinutes(minutes);
 
@@ -42,7 +42,7 @@ public class DiaryController : ControllerBase
                 y.StartTime < endTimeCandidate && y.EndTime > current);
 
             if (!clash)
-                return Ok(new { Start = current, End = endTimeCandidate });
+                return Ok(new AvailableSlotDto { Start = current, End = endTimeCandidate });
 
             var next = items.FirstOrDefault(y => y.StartTime >= current);
             current = next != null && next.EndTime > current
