@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Refactor.Tests.GetAvailableSlotTests.ReturnsAvailableSlot
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.ReturnsAvailableSlot
 {
     public class AfterExistingMeeting
     {

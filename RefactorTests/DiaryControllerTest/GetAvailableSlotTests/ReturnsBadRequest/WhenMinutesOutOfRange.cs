@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Refactor.Tests.GetAvailableSlotTests.ReturnsBadRequest
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.ReturnsBadRequest
 {
     public class WhenMinutesOutOfRange
     {

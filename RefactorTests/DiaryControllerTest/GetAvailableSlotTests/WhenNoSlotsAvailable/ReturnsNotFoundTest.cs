@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Refactor.Tests.GetAvailableSlotTests.WhenNoSlotsAvailable
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.WhenNoSlotsAvailable
 {
     public class ReturnsNotFoundTest
     {
