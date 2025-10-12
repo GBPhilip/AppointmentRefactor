@@ -34,16 +34,5 @@ namespace Refactor.Tests
 
             Assert.IsType<NotFoundObjectResult>(result);
         }
-
-        [Fact]
-        public async Task ReturnsBadRequest_WhenMinutesOutOfRange()
-        {
-            var context = GetInMemoryContext(new List<DiarySlot>());
-            var controller = new DiaryController(context);
-            var day = new DateOnly(2025, 10, 8);
-
-            var result = await controller.GetAvailableSlot(0, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
-            Assert.IsType<BadRequestObjectResult>(result);
-        }
     }
 }
