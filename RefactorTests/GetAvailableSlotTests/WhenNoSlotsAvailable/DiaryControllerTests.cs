@@ -1,22 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Refactor.Tests
+namespace Refactor.Tests.GetAvailableSlotTests.WhenNoSlotsAvailable
 {
     public class DiaryControllerTests
     {
-        internal DiaryContext GetInMemoryContext(List<DiarySlot> slots)
+        private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
+        public DiaryControllerTests()
         {
-            var options = new DbContextOptionsBuilder<DiaryContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-            var context = new DiaryContext(options);
-            context.DiarySlots.AddRange(slots);
-            context.SaveChanges();
-            return context;
+            GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }
         [Fact]
-        public async Task ReturnsNotFound_WhenNoSlotAvailable()
+        public async Task ReturnsNotFound()
         {
             var day = new DateOnly(2025, 10, 8);
             var slots = new List<DiarySlot>
@@ -27,7 +22,7 @@ namespace Refactor.Tests
                     EndTime = day.ToDateTime(new TimeOnly(10, 0, 0))
                 }
             };
-            var context = GetInMemoryContext(slots);
+            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
             var controller = new DiaryController(context);
 
             var result = await controller.GetAvailableSlot(30, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
