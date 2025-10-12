@@ -3,21 +3,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Refactor.Tests.GetAvailableSlotTests.WhenNoSlotsAvailable
 {
-    public class DiaryControllerTests
+    public class ReturnsNotFoundTest
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
-        public DiaryControllerTests()
+        public ReturnsNotFoundTest()
         {
             GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }
+
         [Fact]
         public async Task ReturnsNotFound()
         {
             var day = new DateOnly(2025, 10, 8);
             var slots = new List<DiarySlot>
             {
-                new DiarySlot
-                {
+                new() {
                     StartTime = day.ToDateTime(new TimeOnly(9, 0, 0)),
                     EndTime = day.ToDateTime(new TimeOnly(10, 0, 0))
                 }
