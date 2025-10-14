@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../Refactor/RefactorTests/Refactor.Tests.csproj" />
-  <Project Path="../Refactor/Refactor/Refactor.csproj" />
+  <Project Path="../AppointmentRefactor/RefactorTests/Refactor.Tests.csproj" />
+  <Project Path="../AppointmentRefactor/Refactor/Refactor.csproj" />
 </Solution>

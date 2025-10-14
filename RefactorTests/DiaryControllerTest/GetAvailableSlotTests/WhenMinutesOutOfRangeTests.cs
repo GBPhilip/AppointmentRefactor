@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.ReturnsBadRequest
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
-    public class WhenMinutesOutOfRange
+    public class WhenMinutesOutOfRangeTests
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
 
-        public WhenMinutesOutOfRange()
+        public WhenMinutesOutOfRangeTests()
         {
             GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }
@@ -22,6 +22,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.ReturnsBadReq
             var result = await controller.GetAvailableSlot(minutes, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
             Assert.IsType<BadRequestObjectResult>(result);
         }
+
 
     }
 }

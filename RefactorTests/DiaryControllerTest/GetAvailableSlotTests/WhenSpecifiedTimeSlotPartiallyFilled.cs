@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.ReturnsAvailableSlot
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
-    public class AfterExistingMeeting
+    public class WhenSpecifiedTimeSlotPartiallyFilled
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
 
-        public AfterExistingMeeting()
+        public WhenSpecifiedTimeSlotPartiallyFilled()
         {
             GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }

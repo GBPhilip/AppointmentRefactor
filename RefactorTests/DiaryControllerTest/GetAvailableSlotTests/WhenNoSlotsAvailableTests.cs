@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests.WhenNoSlotsAvailable
+namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
-    public class ReturnsNotFoundTest
+    public class WhenNoSlotsAvailableTests
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
-        public ReturnsNotFoundTest()
+        public WhenNoSlotsAvailableTests()
         {
             GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }
