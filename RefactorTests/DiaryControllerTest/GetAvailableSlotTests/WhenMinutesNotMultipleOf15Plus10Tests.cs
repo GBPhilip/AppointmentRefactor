@@ -6,7 +6,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
 
-        public WheWhenMinutesNotMultipleOf15Plus10Tests()
+        public WhenMinutesNotMultipleOf15Plus10Tests()
         {
             GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
         }

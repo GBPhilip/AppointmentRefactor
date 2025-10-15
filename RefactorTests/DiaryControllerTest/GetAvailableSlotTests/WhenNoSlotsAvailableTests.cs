@@ -25,7 +25,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
             var controller = new DiaryController(context);
 
-            var result = await controller.GetAvailableSlot(30, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
+            var result = await controller.GetAvailableSlot(25, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
 
             Assert.IsType<NotFoundObjectResult>(result);
         }

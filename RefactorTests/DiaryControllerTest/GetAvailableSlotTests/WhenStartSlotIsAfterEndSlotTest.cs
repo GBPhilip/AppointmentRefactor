@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
-    publicl class WhenStartSlotIsAfterEndSlotTest
+    public class WhenStartSlotIsAfterEndSlotTest
     {
         private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
 
@@ -24,5 +22,4 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             Assert.IsType<BadRequestObjectResult>(result);
         }
     }
-}
 }

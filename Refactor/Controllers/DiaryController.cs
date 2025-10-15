@@ -19,11 +19,14 @@ public class DiaryController : ControllerBase
         TimeOnly slotStart,
         TimeOnly slotEnd)
     {
+        if (slotStart >= slotEnd)
+            return BadRequest("slotStart must be earlier than slotEnd.");
+
         if (minutes <= 0 || minutes > 120)
             return BadRequest("Minutes must be between 1 and 120.");
 
-        if (slotStart >= slotEnd)
-            return BadRequest("slotStart must be earlier than slotEnd.");
+        if ((minutes - 10) < 0 || (minutes - 10) % 15 != 0)
+            return BadRequest("Minutes must be a multiple of 15 plus 10 (e.g., 10, 25, 40, ...).");
 
         var startDate = day.ToDateTime(slotStart);
         var endTime = day.ToDateTime(slotEnd);
@@ -34,6 +37,16 @@ public class DiaryController : ControllerBase
             .ToListAsync();
 
         var current = startDate;
+        var allowedMinutes = new[] { 0, 15, 30, 45 };
+        if (!allowedMinutes.Contains(current.Minute))
+        {
+            var nextAllowed = allowedMinutes.FirstOrDefault(m => m > current.Minute);
+            if (nextAllowed == 0) 
+                current = new DateTime(current.Year, current.Month, current.Day, current.Hour + 1, 0, 0);
+            else
+                current = new DateTime(current.Year, current.Month, current.Day, current.Hour, nextAllowed, 0);
+        }
+
         while (current < endTime)
         {
             var endTimeCandidate = current.AddMinutes(minutes);
@@ -41,13 +54,10 @@ public class DiaryController : ControllerBase
             bool clash = items.Any(y =>
                 y.StartTime < endTimeCandidate && y.EndTime > current);
 
-            if (!clash)
+            if (!clash && endTimeCandidate <= endTime)
                 return Ok(new AvailableSlotDto { Start = current, End = endTimeCandidate });
 
-            var next = items.FirstOrDefault(y => y.StartTime >= current);
-            current = next != null && next.EndTime > current
-                ? next.EndTime
-                : current.AddMinutes(1);
+            current = current.AddMinutes(15); // Always move to next quarter-hour
         }
 
         return NotFound("No available slot found.");
