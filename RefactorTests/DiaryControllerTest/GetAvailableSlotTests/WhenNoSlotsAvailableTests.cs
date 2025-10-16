@@ -15,6 +15,12 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         public async Task ReturnsNotFound()
         {
             var day = new DateOnly(2025, 10, 8);
+            var diaryDay = new DiaryDay
+            {
+                Date = day,
+                StartTime = new TimeOnly(9, 0, 0),
+                EndTime = new TimeOnly(17, 0, 0)
+            };
             var slots = new List<DiarySlot>
             {
                 new() {
@@ -22,7 +28,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
                     EndTime = day.ToDateTime(new TimeOnly(10, 0, 0))
                 }
             };
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
+            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
             var controller = new DiaryController(context);
 
             var result = await controller.GetAvailableSlot(25, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));

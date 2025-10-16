@@ -10,10 +10,16 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         public async Task ReturnsOK()
         {
             var slots = new List<DiarySlot>();
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
+            var day = new DateOnly(2025, 10, 8);
+            var diaryDay = new DiaryDay
+            {
+                Date = day,
+                StartTime = new TimeOnly(9, 0, 0),
+                EndTime = new TimeOnly(17, 0, 0)
+            };
+            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
             var controller = new DiaryController(context);
 
-            var day = new DateOnly(2025, 10, 8);
             var result = await controller.GetAvailableSlot(25, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
 
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -23,10 +29,16 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         public async Task ReturnsAvailableSlot()
         {
             var slots = new List<DiarySlot>();
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
+            var day = new DateOnly(2025, 10, 8);
+            var diaryDay = new DiaryDay
+            {
+                Date = day,
+                StartTime = new TimeOnly(9, 0, 0),
+                EndTime = new TimeOnly(17, 0, 0)
+            };
+            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
             var controller = new DiaryController(context);
 
-            var day = new DateOnly(2025, 10, 8);
             var result = await controller.GetAvailableSlot(25, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
             var slot = (result as OkObjectResult).Value as AvailableSlotDto;
             Assert.Multiple(() =>

@@ -21,7 +21,13 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
                 new(startTime: day.ToDateTime(new TimeOnly(9, 45, 0)),
                     endTime: day.ToDateTime(new TimeOnly(10, 15, 0)))
             };
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots);
+            var diaryDay = new DiaryDay
+            {
+                Date = day,
+                StartTime = new TimeOnly(9, 0, 0),
+                EndTime = new TimeOnly(17, 0, 0)
+            };
+            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
             var controller = new DiaryController(context);
 
             var result = await controller.GetAvailableSlot(25, day, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
