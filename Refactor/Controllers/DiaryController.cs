@@ -1,17 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// API controller for managing diary slots and availability.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class DiaryController : ControllerBase
 {
     private readonly DiaryContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiaryController"/> class.
+    /// </summary>
+    /// <param name="context">The diary database context.</param>
     public DiaryController(DiaryContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Gets the first available diary slot of the specified duration within the given time window.
+    /// The slot will start at a valid quarter-hour (00, 15, 30, or 45 minutes past the hour).
+    /// </summary>
+    /// <param name="minutes">The duration of the slot in minutes. Must be a multiple of 15 plus 10 (e.g., 10, 25, 40, ...).</param>
+    /// <param name="day">The date to search for available slots.</param>
+    /// <param name="slotStart">The earliest time to consider for a slot.</param>
+    /// <param name="slotEnd">The latest time to consider for a slot.</param>
+    /// <returns>
+    /// An <see cref="AvailableSlotDto"/> representing the available slot if found; otherwise, a <see cref="NotFoundResult"/>.
+    /// Returns <see cref="BadRequestResult"/> if input parameters are invalid.
+    /// </returns>
     [HttpGet("available")]
     public async Task<IActionResult> GetAvailableSlot(
         int minutes,
