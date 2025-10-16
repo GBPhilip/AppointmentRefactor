@@ -8,38 +8,15 @@ using Microsoft.EntityFrameworkCore;
 [Route("[controller]")]
 public class DiaryController : ControllerBase
 {
-    private readonly DiaryContext _context;
-    private readonly IDiaryDayRepository _diaryDayRepository;
-    private readonly IDiarySlotRepository _diarySlotRepository;
+    private readonly IDiaryService _diaryService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiaryController"/> class.
     /// </summary>
-    /// <param name="context">The diary database context.</param>
-    /// <param name="diaryDayRepository">The repository for accessing diary day information.</param>
-    /// <param name="diarySlotRepository">The repository for accessing diary slot information.</param>
-    public DiaryController(DiaryContext context, IDiaryDayRepository diaryDayRepository, IDiarySlotRepository diarySlotRepository)
+    /// <param name="diaryService">The service for accessing diary information and availability.</param>
+    public DiaryController(IDiaryService diaryService)
     {
-        _context = context;
-        _diaryDayRepository = diaryDayRepository;
-        _diarySlotRepository = diarySlotRepository;
-    }
-
-    private string ValidateSlotRequest(int minutes, DateOnly day, TimeOnly slotStart, TimeOnly slotEnd, DiaryDay diaryDay)
-    {
-        if (slotStart >= slotEnd)
-            return "slotStart must be earlier than slotEnd.";
-        if (minutes <= 0 || minutes > 120)
-            return "Minutes must be between 1 and 120.";
-        if ((minutes - 10) < 0 || (minutes - 10) % 15 != 0)
-            return "Minutes must be a multiple of 15 plus 10 (e.g., 10, 25, 40, ...).";
-        if (diaryDay == null)
-            return "Diary day information not found.";
-        if (slotStart < diaryDay.StartTime)
-            return "slotStart must be after the diary start time for the day.";
-        if (slotEnd > diaryDay.EndTime)
-            return "slotEnd must be before the diary end time for the day.";
-        return null;
+        _diaryService = diaryService;
     }
 
     /// <summary>
@@ -62,16 +39,40 @@ public class DiaryController : ControllerBase
         TimeOnly slotStart,
         TimeOnly slotEnd)
     {
-        var diaryDay = await _diaryDayRepository.GetDiaryDayAsync(day);
-        var validationError = ValidateSlotRequest(minutes, day, slotStart, slotEnd, diaryDay);
-        if (validationError != null)
-            return BadRequest(validationError);
+        var paramError = ValidateSlotParameters(minutes, slotStart, slotEnd);
+        if (paramError != null)
+            return BadRequest(paramError);
 
-        var items = await _diarySlotRepository.GetSlotsForDayAsync(day) ?? [];
+        var diaryDay = await _diaryService.GetDiaryDayAsync(day); 
+        var diaryError = ValidateDiaryDayParameters(slotStart, slotEnd, diaryDay);
+        if (diaryError != null)
+            return BadRequest(diaryError);
 
-        var slot = SlotFinder.FindAvailableSlot(minutes, day, slotStart, slotEnd, diaryDay, items);
+        var slot = await _diaryService.GetAvailableSlotAsync(minutes, day, slotStart, slotEnd);
         if (slot != null)
             return Ok(slot);
         return NotFound("No available slot found.");
+    }
+
+    private string? ValidateSlotParameters(int minutes, TimeOnly slotStart, TimeOnly slotEnd)
+    {
+        if (slotStart >= slotEnd)
+            return "slotStart must be earlier than slotEnd.";
+        if (minutes <= 0 || minutes > 120)
+            return "Minutes must be between 1 and 120.";
+        if ((minutes - 10) < 0 || (minutes - 10) % 15 != 0)
+            return "Minutes must be a multiple of 15 plus 10 (e.g., 10, 25, 40, ...).";
+        return null;
+    }
+
+    private string? ValidateDiaryDayParameters(TimeOnly slotStart, TimeOnly slotEnd, DiaryDay? diaryDay)
+    {
+        if (diaryDay == null)
+            return "Diary day information not found.";
+        if (slotStart < diaryDay.StartTime)
+            return "slotStart must be after the diary start time for the day.";
+        if (slotEnd > diaryDay.EndTime)
+            return "slotEnd must be before the diary end time for the day.";
+        return null;
     }
 }
