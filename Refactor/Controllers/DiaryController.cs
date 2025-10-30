@@ -26,7 +26,7 @@ public class DiaryController : ControllerBase
     /// </summary>
     /// <param name="minutes">The duration of the slot in minutes. Must be a multiple of 15 plus 10 (e.g., 10, 25, 40, ...).</param>
     /// <param name="day">The date to search for available slots.</param>
-    /// <param name="slotStart">The earliest time to consider for a slot.</param>
+    /// <param name="slotStartTime">The earliest time to consider for a slot.</param>
     /// <param name="slotEnd">The latest time to consider for a slot.</param>
     /// <returns>
     /// An <see cref="AvailableSlotDto"/> representing the available slot if found; otherwise, a <see cref="NotFoundResult"/>.
@@ -36,10 +36,10 @@ public class DiaryController : ControllerBase
     public async Task<IActionResult> GetAvailableSlot(
         int minutes,
         DateOnly day,
-        TimeOnly slotStart,
+        TimeOnly slotStartTime,
         TimeOnly slotEnd)
     {
-        if (slotStart >= slotEnd)
+        if (slotStartTime >= slotEnd)
             return BadRequest("slotStart must be earlier than slotEnd.");
 
         if (minutes <= 0 || minutes > 120)
@@ -56,7 +56,7 @@ public class DiaryController : ControllerBase
         var diaryStartDateTime = day.ToDateTime(diaryDay.StartTime);
         var diaryEndDateTime = day.ToDateTime(diaryDay.EndTime);
 
-        if (slotStart < diaryDay.StartTime)
+        if (slotStartTime < diaryDay.StartTime)
             return BadRequest("slotStart must be after the diary start time for the day.");
 
         if (slotEnd > diaryDay.EndTime)
@@ -76,7 +76,7 @@ public class DiaryController : ControllerBase
         if (endTime > diaryEndDateTime)
             endTime = diaryEndDateTime;
 
-        var startDate = day.ToDateTime(slotStart); 
+        var startDate = day.ToDateTime(slotStartTime); 
 
         var items = await _context.DiarySlots
             .Where(x => DateOnly.FromDateTime(x.StartTime) == day)
