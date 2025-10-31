@@ -14,7 +14,7 @@ public class DiaryService : IDiaryService
         return await _diaryDayRepository.GetDiaryDayAsync(day);
     }
 
-    public async Task<AvailableSlotDto?> GetAvailableSlotAsync(int minutes, DateOnly day, TimeOnly slotStart, TimeOnly slotEnd)
+    public async Task<AvailableSlotDto?> GetAvailableSlotAsync(int minutes, DateOnly day, TimeOnly slotStart, TimeOnly slotEnd, DiaryDay diaryDay)
     {
         var items = await _diarySlotRepository.GetSlotsForDayAsync(day);
         return SlotFinder.FindAvailableSlot(minutes, day, slotStart, slotEnd, diaryDay, items);

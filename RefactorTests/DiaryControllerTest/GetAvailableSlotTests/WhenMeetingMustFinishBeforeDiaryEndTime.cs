@@ -5,60 +5,72 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
     public class WhenMeetingMustFinishBeforeDiaryEndTime
     {
-        private GetAvailableSlotTestHelpers GetAvailableSlotTestHelpers;
+        private GetAvailableSlotTestHelpers _getAvailableSlotTestHelpers;
+        private DiaryDayValidator _diaryDayValidator;
+        private IDiarySlotRepository _diarySlotRepository;
+        private IDiaryDayRepository _diaryDayRepository;
+        private readonly DateOnly _testDay = new(2025, 10, 8);
+        private readonly DiaryDay _testDiaryDay = new()
+        {
+            Date = new DateOnly(2025, 10, 8),
+            StartTime = new TimeOnly(9, 0, 0),
+            EndTime = new TimeOnly(17, 0, 0)
+        };
+
+        private readonly DiaryController _sut;
+
+        private DiaryContext _context;
+        private readonly DiaryService _diaryService;
 
         public WhenMeetingMustFinishBeforeDiaryEndTime()
         {
-            GetAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
+            _getAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
+            _diaryDayValidator = new DiaryDayValidator(
+            [
+                new DiaryDayExistsRule(),
+                new SlotStartAfterDiaryStartRule(),
+                new SlotEndBeforeDiaryEndRule()
+            ]);
+            _context = _getAvailableSlotTestHelpers.GetInMemoryContext([], _testDiaryDay);
+            _diarySlotRepository = new DiarySlotRepository(_context);
+            _diaryDayRepository = new DiaryDayRepository(_context);
+            _diaryService = new DiaryService(_diaryDayRepository, _diarySlotRepository);
+            _sut = new DiaryController(_diaryService, _diaryDayValidator);
         }
 
         [Fact]
         public async Task ReturnsSlotThatFinishesBeforeDiaryEndTime()
         {
-            var day = new DateOnly(2025, 10, 8);
-            var diaryDay = new DiaryDay
-            {
-                Date = day,
-                StartTime = new TimeOnly(9, 0, 0),
-                EndTime = new TimeOnly(17, 0, 0)
-            };
-
-            var slotStart = new TimeOnly(16, 30, 0);
-            var startDate = day.ToDateTime(slotStart); // Should be 2025-10-08 16:30:00
-
-            var slots = new List<DiarySlot>();
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
-            var controller = new DiaryController(context);
-
-            var result = await controller.GetAvailableSlot(25, day, new TimeOnly(16, 30, 0), new TimeOnly(17, 0, 0));
+            var result = await _sut.GetAvailableSlot(
+                 new GetAvailableSlotRequest
+                 {
+                     Minutes = 25,
+                     Day = _testDay,
+                     SlotStart = new TimeOnly(16, 30, 0),
+                     SlotEnd = new TimeOnly(17, 0, 0)
+                 });
             var slot = (result as OkObjectResult)?.Value as AvailableSlotDto;
 
             Assert.Multiple(() =>
             {
                 Assert.NotNull(slot);
-                Assert.Equal(day.ToDateTime(new TimeOnly(16, 30, 0)), slot.Start);
-                Assert.Equal(day.ToDateTime(new TimeOnly(16, 55, 0)), slot.End);
-                Assert.True(slot.End <= day.ToDateTime(diaryDay.EndTime));
+                Assert.Equal(_testDay.ToDateTime(new TimeOnly(16, 30, 0)), slot.Start);
+                Assert.Equal(_testDay.ToDateTime(new TimeOnly(16, 55, 0)), slot.End);
+                Assert.True(slot.End <= _testDay.ToDateTime(_testDiaryDay.EndTime));
             });
         }
 
         [Fact]
         public async Task DoesNotReturnSlotIfMeetingWouldFinishAfterDiaryEndTime()
         {
-            var day = new DateOnly(2025, 10, 8);
-            var diaryDay = new DiaryDay
-            {
-                Date = day,
-                StartTime = new TimeOnly(9, 0, 0),
-                EndTime = new TimeOnly(17, 0, 0)
-            };
-
-            var slots = new List<DiarySlot>();
-            var context = GetAvailableSlotTestHelpers.GetInMemoryContext(slots, diaryDay);
-            var controller = new DiaryController(context);
-
-            // Request a slot that would end after diary end time
-            var result = await controller.GetAvailableSlot(25, day, new TimeOnly(16, 45, 0), new TimeOnly(17, 0, 0));
+            var result = await _sut.GetAvailableSlot(
+                 new GetAvailableSlotRequest
+                 {
+                     Minutes = 25,
+                     Day = _testDay,
+                     SlotStart = new TimeOnly(16, 45, 0),
+                     SlotEnd = new TimeOnly(17, 0, 0)
+                 });
             Assert.IsType<NotFoundObjectResult>(result);
         }
     }

@@ -3,22 +3,25 @@ using Microsoft.AspNetCore.Mvc;
 /// <summary>
 /// API controller for managing diary slots and availability.
 /// </summary>
-[ApiController] 
+[ApiController]
 [Route("[controller]")]
 public class DiaryController : ControllerBase
 {
     private readonly IDiaryService _diaryService;
+    private readonly DiaryDayValidator _diaryDayValidator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiaryController"/> class.
     /// </summary>
     /// <param name="diaryService">The service for accessing diary information and availability.</param>
-    public DiaryController(IDiaryService diaryService)
+    /// <param name="diaryDayValidator">The validator for diary day rules.</param>
+    public DiaryController(IDiaryService diaryService, DiaryDayValidator diaryDayValidator)
     {
         _diaryService = diaryService;
+        _diaryDayValidator = diaryDayValidator;
     }
 
-    private string ValidateSlotParameters(TimeOnly slotStart, TimeOnly slotEnd, int minutes)
+    private string? ValidateSlotParameters(TimeOnly slotStart, TimeOnly slotEnd, int minutes)
     {
         if (slotStart >= slotEnd)
             return "slotStart must be earlier than slotEnd.";
@@ -48,14 +51,11 @@ public class DiaryController : ControllerBase
             return BadRequest(paramError);
 
         var diaryDay = await _diaryService.GetDiaryDayAsync(request.Day);
-        if (diaryDay == null)
-            return BadRequest("Diary day information not found.");
-        if (request.SlotStart < diaryDay.StartTime)
-            return BadRequest("slotStart must be after the diary start time for the day.");
-        if (request.SlotEnd > diaryDay.EndTime)
-            return BadRequest("slotEnd must be before the diary end time for the day.");
+        var diaryDayError = _diaryDayValidator.Validate(request, diaryDay);
+        if (diaryDayError != null)
+            return BadRequest(diaryDayError);
 
-        var slot = await _diaryService.GetAvailableSlotAsync(request.Minutes, request.Day, request.SlotStart, request.SlotEnd);
+        var slot = await _diaryService.GetAvailableSlotAsync(request.Minutes, request.Day, request.SlotStart, request.SlotEnd, diaryDay);
         if (slot != null)
             return Ok(slot);
         return NotFound("No available slot found.");
