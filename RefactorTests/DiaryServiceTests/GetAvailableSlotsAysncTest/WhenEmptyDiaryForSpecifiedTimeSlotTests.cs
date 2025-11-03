@@ -21,7 +21,8 @@ namespace Refactor.Tests.DiaryServiceTests.GetAvailableSlotsAysncTest
             var sut = new DiaryService(diaryDayRepository.Object, diarySlotRepository.Object); 
             diarySlotRepository.Setup(x => x.GetSlotsForDayAsync(testDay))
                 .ReturnsAsync([]);
-            var result = await sut.GetAvailableSlotAsync(25, testDay, new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0), testDiaryDay);
+            var window = new SlotWindow(new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
+            var result = await sut.GetAvailableSlotAsync(25, testDay, window, testDiaryDay);
 
             Assert.Multiple(() =>
                 {

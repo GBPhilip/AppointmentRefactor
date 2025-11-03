@@ -41,13 +41,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [Fact]
         public async Task ReturnsOK()
         {
+            var window = new SlotWindow(new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
             var result = await _sut.GetAvailableSlot(
                             new GetAvailableSlotRequest
                             {
                                 Minutes = 25,
                                 Day = _testDay,
-                                SlotStart = new TimeOnly(9, 0, 0),
-                                SlotEnd = new TimeOnly(10, 0, 0)
+                                SlotStart = window.Start,
+                                SlotEnd = window.End
                             });
 
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -56,13 +57,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [Fact]
         public async Task ReturnsAvailableSlot()
         {
+            var window = new SlotWindow(new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
             var result = await _sut.GetAvailableSlot(
                             new GetAvailableSlotRequest
                             {
                                 Minutes = 25,
                                 Day = _testDay,
-                                SlotStart = new TimeOnly(9, 0, 0),
-                                SlotEnd = new TimeOnly(10, 0, 0)
+                                SlotStart = window.Start,
+                                SlotEnd = window.End
                             });
             var slot = (result as OkObjectResult)?.Value as AvailableSlotDto;
             Assert.Multiple(() =>

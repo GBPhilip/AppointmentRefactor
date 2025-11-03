@@ -5,21 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class DiaryController : ControllerBase
+public class DiaryController(IDiaryService diaryService, DiaryDayValidator diaryDayValidator) : ControllerBase
 {
-    private readonly IDiaryService _diaryService;
-    private readonly DiaryDayValidator _diaryDayValidator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DiaryController"/> class.
-    /// </summary>
-    /// <param name="diaryService">The service for accessing diary information and availability.</param>
-    /// <param name="diaryDayValidator">The validator for diary day rules.</param>
-    public DiaryController(IDiaryService diaryService, DiaryDayValidator diaryDayValidator)
-    {
-        _diaryService = diaryService;
-        _diaryDayValidator = diaryDayValidator;
-    }
+    private readonly IDiaryService _diaryService = diaryService;
+    private readonly DiaryDayValidator _diaryDayValidator = diaryDayValidator;
 
     private string? ValidateSlotParameters(TimeOnly slotStart, TimeOnly slotEnd, int minutes)
     {
@@ -54,8 +43,8 @@ public class DiaryController : ControllerBase
         var diaryDayError = _diaryDayValidator.Validate(request, diaryDay);
         if (diaryDayError != null)
             return BadRequest(diaryDayError);
-
-        var slot = await _diaryService.GetAvailableSlotAsync(request.Minutes, request.Day, request.SlotStart, request.SlotEnd, diaryDay);
+        var window = new SlotWindow(request.SlotStart, request.SlotEnd);
+        var slot = await _diaryService.GetAvailableSlotAsync(request.Minutes, request.Day, window, diaryDay);
         if (slot != null)
             return Ok(slot);
         return NotFound("No available slot found.");

@@ -42,14 +42,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [InlineData(24)]
         public async Task ReturnsBadRequest_WhenMinutesNotMultipleOf15Plus10(int minutes)
         {
-
+            var window = new SlotWindow(new TimeOnly(9, 0, 0), new TimeOnly(10, 0, 0));
             var result = await _sut.GetAvailableSlot(
                  new GetAvailableSlotRequest
                  {
                      Minutes = minutes,
                      Day = _testDay,
-                     SlotStart = new TimeOnly(9, 0, 0),
-                     SlotEnd = new TimeOnly(10, 0, 0)
+                     SlotStart = window.Start,
+                     SlotEnd = window.End
                  });
             Assert.IsType<BadRequestObjectResult>(result);
         }

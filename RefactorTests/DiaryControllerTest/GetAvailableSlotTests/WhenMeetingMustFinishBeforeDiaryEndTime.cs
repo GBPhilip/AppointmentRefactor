@@ -41,13 +41,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [Fact]
         public async Task ReturnsSlotThatFinishesBeforeDiaryEndTime()
         {
+            var window = new SlotWindow(new TimeOnly(16, 30, 0), new TimeOnly(17, 0, 0));
             var result = await _sut.GetAvailableSlot(
                  new GetAvailableSlotRequest
                  {
                      Minutes = 25,
                      Day = _testDay,
-                     SlotStart = new TimeOnly(16, 30, 0),
-                     SlotEnd = new TimeOnly(17, 0, 0)
+                     SlotStart = window.Start,
+                     SlotEnd = window.End
                  });
             var slot = (result as OkObjectResult)?.Value as AvailableSlotDto;
 
@@ -63,13 +64,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [Fact]
         public async Task DoesNotReturnSlotIfMeetingWouldFinishAfterDiaryEndTime()
         {
+            var window = new SlotWindow(new TimeOnly(16, 45, 0), new TimeOnly(17, 0, 0));
             var result = await _sut.GetAvailableSlot(
                  new GetAvailableSlotRequest
                  {
                      Minutes = 25,
                      Day = _testDay,
-                     SlotStart = new TimeOnly(16, 45, 0),
-                     SlotEnd = new TimeOnly(17, 0, 0)
+                     SlotStart = window.Start,
+                     SlotEnd = window.End
                  });
             Assert.IsType<NotFoundObjectResult>(result);
         }

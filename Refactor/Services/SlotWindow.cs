@@ -1,0 +1,1 @@
+public record SlotWindow(TimeOnly Start, TimeOnly End);

@@ -40,14 +40,14 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
         [Fact]
         public async Task ReturnsBadRequest()
         {
-
+            var window = new SlotWindow(new TimeOnly(9, 30, 0), new TimeOnly(9, 0, 0));
             var result = await _sut.GetAvailableSlot(
                  new GetAvailableSlotRequest
-                 { 
-                     Minutes = 25, 
-                     Day = _testDay, 
-                     SlotStart = new TimeOnly(9, 30, 0), 
-                     SlotEnd = new TimeOnly(9, 0, 0)
+                 {
+                     Minutes = 25,
+                     Day = _testDay,
+                     SlotStart = window.Start,
+                     SlotEnd = window.End
                  });
             Assert.IsType<BadRequestObjectResult>(result);
         }
