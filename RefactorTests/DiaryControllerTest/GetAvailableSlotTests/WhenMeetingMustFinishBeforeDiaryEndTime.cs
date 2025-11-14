@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Refactor.Data;
 using Xunit;
 
 namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
