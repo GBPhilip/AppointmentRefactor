@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
+using Refactor.Controllers;
 using Refactor.Data;
+using Refactor.Validation;
 
 namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
     public class WhenEmptyDiaryForSpecifiedTimeSlotTests
     {
-        private GetAvailableSlotTestHelpers _getAvailableSlotTestHelpers;
-        private DiaryDayValidator _diaryDayValidator;
-        private IDiarySlotRepository _diarySlotRepository;
-        private IDiaryDayRepository _diaryDayRepository;
+        private readonly GetAvailableSlotTestHelpers _getAvailableSlotTestHelpers;
+        private readonly DiaryDayValidator _diaryDayValidator;
+        private readonly IDiarySlotRepository _diarySlotRepository;
+        private readonly IDiaryDayRepository _diaryDayRepository;
         private readonly DateOnly _testDay = new(2025, 10, 8);
         private readonly DiaryDay _testDiaryDay = new()
         {
@@ -19,7 +22,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 
         private readonly DiaryController _sut;
 
-        private DiaryContext _context;
+        private readonly DiaryContext _context;
         private readonly DiaryService _diaryService;
 
         public WhenEmptyDiaryForSpecifiedTimeSlotTests()
@@ -28,8 +31,6 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             _diaryDayValidator = new DiaryDayValidator(
             [
                 new DiaryDayExistsRule(),
-                new SlotStartAfterDiaryStartRule(),
-                new SlotEndBeforeDiaryEndRule()
             ]);
             _context = _getAvailableSlotTestHelpers.GetInMemoryContext([], _testDiaryDay);
             _diarySlotRepository = new DiarySlotRepository(_context);
@@ -70,8 +71,8 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             var slot = (result as OkObjectResult)?.Value as AvailableSlotDto;
             Assert.Multiple(() =>
                 {
-                    Assert.Equal(_testDay.ToDateTime(new TimeOnly(9, 0, 0)), slot.Start);
-                    Assert.Equal(_testDay.ToDateTime(new TimeOnly(9, 25, 0)), slot.End);
+                    Assert.Equal(_testDay.ToDateTime(new TimeOnly(9, 0, 0)), slot?.Start);
+                    Assert.Equal(_testDay.ToDateTime(new TimeOnly(9, 25, 0)), slot?.End);
                 }
             );
         }

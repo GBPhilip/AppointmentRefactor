@@ -1,3 +1,5 @@
+using Refactor.Validation;
+
 /// <summary>
 /// Validates that the slot end time is before the diary day's end time.
 /// </summary>

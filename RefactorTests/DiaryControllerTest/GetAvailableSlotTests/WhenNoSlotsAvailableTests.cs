@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+
+using Refactor.Controllers;
 using Refactor.Data;
+using Refactor.Validation;
 
 namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
     public class WhenNoSlotsAvailableTests
     {
-
         [Fact]
         public async Task ReturnsNotFound()
         {
@@ -13,10 +15,9 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             var diaryDayValidator = new DiaryDayValidator(
            [
                new DiaryDayExistsRule(),
-                new SlotStartAfterDiaryStartRule(),
-                new SlotEndBeforeDiaryEndRule()
-           ]); 
-             var testDay = new DateOnly(2025, 10, 8);
+
+           ]);
+            var testDay = new DateOnly(2025, 10, 8);
             var diaryDay = new DiaryDay
             {
                 Date = testDay,

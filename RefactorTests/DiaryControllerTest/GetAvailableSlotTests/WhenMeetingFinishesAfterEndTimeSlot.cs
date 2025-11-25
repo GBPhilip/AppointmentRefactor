@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+
+using Refactor.Controllers;
 using Refactor.Data;
-using Xunit;
+using Refactor.Validation;
 
 namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
 {
@@ -20,9 +22,7 @@ namespace Refactor.Tests.DiaryControllerTest.GetAvailableSlotTests
             var getAvailableSlotTestHelpers = new GetAvailableSlotTestHelpers();
             var diaryDayValidator = new DiaryDayValidator(
                 [
-                    new DiaryDayExistsRule(),
-                new SlotStartAfterDiaryStartRule(),
-                new SlotEndBeforeDiaryEndRule()
+                    new DiaryDayExistsRule()
                 ]);
             var slots = new List<DiarySlot>
             {

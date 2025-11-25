@@ -1,28 +1,30 @@
-using System.Collections.Generic;
-
-/// <summary>
-/// Aggregates and applies DiaryDay validation rules for available slot requests.
-/// </summary>
-public class DiaryDayValidator
+namespace Refactor.Validation
 {
-    private readonly List<IDiaryDayRule> _rules;
-
-    public DiaryDayValidator(IEnumerable<IDiaryDayRule> rules)
-    {
-        _rules = new List<IDiaryDayRule>(rules);
-    }
 
     /// <summary>
-    /// Validates all rules and returns the first error message found, or null if all pass.
+    /// Aggregates and applies DiaryDay validation rules for available slot requests.
     /// </summary>
-    public string? Validate(GetAvailableSlotRequest request, DiaryDay? diaryDay)
+    public class DiaryDayValidator
     {
-        foreach (var rule in _rules)
+        private readonly List<IDiaryDayRule> _rules;
+
+        public DiaryDayValidator(IEnumerable<IDiaryDayRule> rules)
         {
-            var error = rule.Validate(request, diaryDay);
-            if (error != null)
-                return error;
+            _rules = new List<IDiaryDayRule>(rules);
         }
-        return null;
+
+        /// <summary>
+        /// Validates all rules and returns the first error message found, or null if all pass.
+        /// </summary>
+        public string? Validate(GetAvailableSlotRequest request, DiaryDay? diaryDay)
+        {
+            foreach (var rule in _rules)
+            {
+                var error = rule.Validate(request, diaryDay);
+                if (error != null)
+                    return error;
+            }
+            return null;
+        }
     }
 }

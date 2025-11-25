@@ -1,3 +1,5 @@
+using Refactor.Services;
+
 public class DiaryService : IDiaryService
 {
     private readonly IDiaryDayRepository _diaryDayRepository;
